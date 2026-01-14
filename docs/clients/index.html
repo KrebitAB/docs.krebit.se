@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.6.1">
 <title data-rh="true">Clients guide | Krebit Finance API documentation</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://docs.krebit.se/docs/clients/"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Clients guide | Krebit Finance API documentation"><meta data-rh="true" name="description" content="Understand how Krebit Finance models clients, credit data, and operational details."><meta data-rh="true" property="og:description" content="Understand how Krebit Finance models clients, credit data, and operational details."><link data-rh="true" rel="icon" href="/img/favicon.png"><link data-rh="true" rel="canonical" href="https://docs.krebit.se/docs/clients/"><link data-rh="true" rel="alternate" href="https://docs.krebit.se/docs/clients/" hreflang="en"><link data-rh="true" rel="alternate" href="https://docs.krebit.se/docs/clients/" hreflang="x-default"><link rel="stylesheet" href="/assets/css/styles.be4bd688.css">
-<script src="/assets/js/runtime~main.4b0def15.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.3d3a04f0.js" defer="defer"></script>
 <script src="/assets/js/main.c7e15f13.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -29,6 +29,7 @@
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="data-handling-guidance">Data handling guidance<a href="#data-handling-guidance" class="hash-link" aria-label="Direct link to Data handling guidance" title="Direct link to Data handling guidance">​</a></h2>
 <ul>
 <li><strong>Sensitive fields</strong> - Treat organization numbers and contact information as sensitive data. Mask or hash values before logging.</li>
+<li><strong>Stable identifiers</strong> - Use <code>org_number</code> as a durable key when reconciling client records across systems.</li>
 <li><strong>Caching</strong> - Cache client responses briefly (for example, 5-15 minutes) when building dashboards to reduce API calls.</li>
 <li><strong>Change detection</strong> - Use <code>updated_at</code> to detect changes and reconcile client updates in your database.</li>
 </ul>
