@@ -251,6 +251,120 @@
                 ]
             }
         },
+        "/api/1.0/acts": {
+            "get": {
+                "tags": [
+                    "Acts"
+                ],
+                "summary": "Gets a list of acts",
+                "description": "Display a listing of the resource.",
+                "operationId": "getActs",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "The number of acts to return",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 10,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "The page number to return",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ActCollectionResource"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "A valid authentication token was not provided with the request"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/1.0/acts/{uuid}": {
+            "get": {
+                "tags": [
+                    "Acts"
+                ],
+                "summary": "Get an act",
+                "description": "Display the specified act.",
+                "operationId": "getAct",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "The UUID of the act",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "123e4567-e89b-12d3-a456-426614174000"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "A valid authentication token was not provided with the request"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/1.0/clients": {
             "get": {
                 "tags": [
@@ -375,12 +489,7 @@
                 "properties": {
                     "event": {
                         "type": "string",
-                        "enum": [
-                            "signing.sent",
-                            "signing.cancelled",
-                            "signing.document.completed"
-                        ],
-                        "example": "document.completed"
+                        "example": "event"
                     },
                     "target": {
                         "type": "string",
@@ -420,7 +529,7 @@
                     },
                     "event": {
                         "type": "string",
-                        "example": "document.completed"
+                        "example": "event"
                     },
                     "target": {
                         "type": "string",
@@ -457,7 +566,7 @@
                     },
                     "event": {
                         "type": "string",
-                        "example": "document.completed"
+                        "example": "event"
                     },
                     "target": {
                         "type": "string",
@@ -472,6 +581,86 @@
                         "example": "2021-09-01T12:00:00Z"
                     },
                     "updated_at": {
+                        "type": "string",
+                        "example": "2021-09-01T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "ActCollectionResource": {
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "123e4567-e89b-12d3-a456-426614174000"
+                    },
+                    "client_id": {
+                        "type": "integer",
+                        "example": "12345"
+                    },
+                    "template_id": {
+                        "type": "integer",
+                        "example": "12345"
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "example": "10000"
+                    },
+                    "currency": {
+                        "type": "string",
+                        "example": "SEK"
+                    },
+                    "language": {
+                        "type": "string",
+                        "example": "SV"
+                    },
+                    "created_at": {
+                        "description": "The date when this act was created",
+                        "type": "string",
+                        "example": "2021-09-01T12:00:00Z"
+                    },
+                    "updated_at": {
+                        "description": "The date when this act was last updated",
+                        "type": "string",
+                        "example": "2021-09-01T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "ActResource": {
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "123e4567-e89b-12d3-a456-426614174000"
+                    },
+                    "client_id": {
+                        "type": "integer",
+                        "example": "12345"
+                    },
+                    "template_id": {
+                        "type": "integer",
+                        "example": "12345"
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "example": "10000"
+                    },
+                    "currency": {
+                        "type": "string",
+                        "example": "SEK"
+                    },
+                    "language": {
+                        "type": "string",
+                        "example": "SV"
+                    },
+                    "created_at": {
+                        "description": "The date when this act was created",
+                        "type": "string",
+                        "example": "2021-09-01T12:00:00Z"
+                    },
+                    "updated_at": {
+                        "description": "The date when this act was last updated",
                         "type": "string",
                         "example": "2021-09-01T12:00:00Z"
                     }
@@ -617,6 +806,10 @@
         {
             "name": "Webhooks",
             "description": "Operations related to webhooks"
+        },
+        {
+            "name": "Acts",
+            "description": "Operations related to financial acts"
         },
         {
             "name": "Clients",
