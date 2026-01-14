@@ -1,0 +1,626 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Krebit Finance API documentation",
+        "description": "This is the API documentation for the Krebit Finance API",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "https://{organization}.krebit.se",
+            "description": "Krebit Finance API server",
+            "variables": {
+                "organization": {
+                    "default": "{organization}",
+                    "description": "The organization to use"
+                }
+            }
+        }
+    ],
+    "paths": {
+        "/api/1.0/me": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Gets the current user",
+                "description": "Display a listing of the resource.",
+                "operationId": "getCurrentUser",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "A valid authentication token was not provided with the request"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/1.0/webhooks": {
+            "get": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Gets a list of webhooks",
+                "description": "Display a listing of the resource.",
+                "operationId": "getWebhooks",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "The number of webhooks to return",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 10,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "The page number to return",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/WebhookCollectionResource"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "A valid authentication token was not provided with the request"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Create a new webhook",
+                "description": "Create a new webhook.",
+                "operationId": "createWebhook",
+                "requestBody": {
+                    "description": "Data required to create a webhook",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/WebhookStoreRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Webhook created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/WebhookResource"
+                                        },
+                                        "secret": {
+                                            "description": "The secret key used to validate signatures in webhook calls.",
+                                            "type": "string",
+                                            "example": "48ez4Rjz7pt2jguhuBHpoIm7rfKGGv1KxiG8UWRB"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "A valid authentication token was not provided with the request"
+                    },
+                    "400": {
+                        "description": "Invalid input data provided"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/1.0/webhooks/{uuid}": {
+            "get": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Get a webhook",
+                "description": "Display the specified webhook.",
+                "operationId": "getWebhook",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "The UUID of the webhook",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "d3b3b3b3-3b3b-3b3b-3b3b-3b3b3b3b3b3b"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/WebhookResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "A valid authentication token was not provided with the request"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Delete a webhook",
+                "description": "Delete the specified webhook.",
+                "operationId": "deleteWebhook",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "The UUID of the webhook",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "d3b3b3b3-3b3b-3b3b-3b3b-3b3b3b3b3b3b"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Webhook deleted successfully"
+                    },
+                    "401": {
+                        "description": "A valid authentication token was not provided with the request"
+                    },
+                    "404": {
+                        "description": "Webhook not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/1.0/clients": {
+            "get": {
+                "tags": [
+                    "Clients"
+                ],
+                "summary": "Gets a list of clients",
+                "description": "Display a listing of the resource.",
+                "operationId": "getClients",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "The number of clients to return",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 10,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "The page number to return",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ClientCollectionResource"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "A valid authentication token was not provided with the request"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/1.0/clients/{id}": {
+            "get": {
+                "tags": [
+                    "Clients"
+                ],
+                "summary": "Get a client",
+                "description": "Display the specified client.",
+                "operationId": "getClient",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The id of the client",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 12345
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ClientResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "A valid authentication token was not provided with the request"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "WebhookStoreRequest": {
+                "required": [
+                    "event",
+                    "target"
+                ],
+                "properties": {
+                    "event": {
+                        "type": "string",
+                        "enum": [
+                            "signing.sent",
+                            "signing.cancelled",
+                            "signing.document.completed"
+                        ],
+                        "example": "document.completed"
+                    },
+                    "target": {
+                        "type": "string",
+                        "example": "https://example.com/webhook"
+                    }
+                },
+                "type": "object"
+            },
+            "UserResource": {
+                "properties": {
+                    "name": {
+                        "description": "Name of the user",
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "email": {
+                        "description": "Email of the user",
+                        "type": "string",
+                        "example": "john.doe@example.com"
+                    }
+                },
+                "type": "object"
+            },
+            "WebhookCollectionResource": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "d3b3b3b3-3b3b-3b3b-3b3b-3b3b3b3b3b3b"
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": "1"
+                    },
+                    "oauth_client_id": {
+                        "type": "string",
+                        "example": "d3b3b3b3-3b3b-3b3b-3b3b-3b3b3b3b3b3b"
+                    },
+                    "event": {
+                        "type": "string",
+                        "example": "document.completed"
+                    },
+                    "target": {
+                        "type": "string",
+                        "example": "https://example.com/webhook"
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "example": "2021-09-01T12:00:00Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "example": "2021-09-01T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "WebhookResource": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "d3b3b3b3-3b3b-3b3b-3b3b-3b3b3b3b3b3b"
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": "1"
+                    },
+                    "oauth_client_id": {
+                        "type": "string",
+                        "example": "d3b3b3b3-3b3b-3b3b-3b3b-3b3b3b3b3b3b"
+                    },
+                    "event": {
+                        "type": "string",
+                        "example": "document.completed"
+                    },
+                    "target": {
+                        "type": "string",
+                        "example": "https://example.com/webhook"
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "example": "2021-09-01T12:00:00Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "example": "2021-09-01T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "ClientCollectionResource": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 12345
+                    },
+                    "company_name": {
+                        "description": "The name of the client",
+                        "type": "string",
+                        "example": "Krebit AB"
+                    },
+                    "org_number": {
+                        "description": "The organization number of the client",
+                        "type": "string",
+                        "example": "5566778899"
+                    },
+                    "country": {
+                        "description": "The country of the client",
+                        "type": "string",
+                        "example": "SE"
+                    },
+                    "created_at": {
+                        "description": "The date when this client was created",
+                        "type": "string",
+                        "example": "2021-09-01T12:00:00Z"
+                    },
+                    "updated_at": {
+                        "description": "The date when this client was last updated",
+                        "type": "string",
+                        "example": "2021-09-01T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "ClientResource": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 12345
+                    },
+                    "company_name": {
+                        "description": "The name of the client",
+                        "type": "string",
+                        "example": "Krebit AB"
+                    },
+                    "org_number": {
+                        "description": "The organization number of the client",
+                        "type": "string",
+                        "example": "5566778899"
+                    },
+                    "credit_limit": {
+                        "description": "The credit limit of the client",
+                        "type": "integer",
+                        "example": 100000
+                    },
+                    "credit_limit_currency": {
+                        "description": "The currency of the credit limit",
+                        "type": "string",
+                        "example": "SEK"
+                    },
+                    "street_address": {
+                        "description": "The street address of the client",
+                        "type": "string",
+                        "example": "123 Main St"
+                    },
+                    "zip_code": {
+                        "description": "The zip code of the client",
+                        "type": "string",
+                        "example": "12345"
+                    },
+                    "city": {
+                        "description": "The city of the client",
+                        "type": "string",
+                        "example": "Stockholm"
+                    },
+                    "notes": {
+                        "description": "Additional notes about the client",
+                        "type": "string",
+                        "example": "Preferred customer"
+                    },
+                    "contact_person_name": {
+                        "description": "The name of the contact person for the client",
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "contact_person_email": {
+                        "description": "The email of the contact person for the client",
+                        "type": "string",
+                        "example": "john.doe@krebit.se"
+                    },
+                    "contact_person_phone": {
+                        "description": "The phone number of the contact person for the client",
+                        "type": "string",
+                        "example": "+46123456789"
+                    },
+                    "credit_rating": {
+                        "description": "The credit rating of the client",
+                        "type": "string",
+                        "example": "A+"
+                    },
+                    "credit_rating_source": {
+                        "description": "The source of the credit rating",
+                        "type": "string",
+                        "example": "Creditsafe"
+                    },
+                    "country": {
+                        "description": "The country of the client",
+                        "type": "string",
+                        "example": "SE"
+                    },
+                    "created_at": {
+                        "description": "The date when this client was created",
+                        "type": "string",
+                        "example": "2021-09-01T12:00:00Z"
+                    },
+                    "updated_at": {
+                        "description": "The date when this client was last updated",
+                        "type": "string",
+                        "example": "2021-09-01T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Users",
+            "description": "Operations related to users"
+        },
+        {
+            "name": "Webhooks",
+            "description": "Operations related to webhooks"
+        },
+        {
+            "name": "Clients",
+            "description": "Operations related to clients"
+        }
+    ]
+}
