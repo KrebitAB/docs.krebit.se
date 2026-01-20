@@ -365,6 +365,191 @@
                 ]
             }
         },
+        "/api/1.0/acts/{uuid}/data": {
+            "get": {
+                "tags": [
+                    "Acts"
+                ],
+                "summary": "Get all data points from an act",
+                "description": "Get all data points from an act.",
+                "operationId": "getActData",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "The UUID of the act",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "123e4567-e89b-12d3-a456-426614174000"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DataCollectionResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "A valid authentication token was not provided with the request"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Acts"
+                ],
+                "summary": "Bulk update data points",
+                "description": "Bulk update data points.",
+                "operationId": "bulkUpdateActData",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "The UUID of the act",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "123e4567-e89b-12d3-a456-426614174000"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "data": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 100
+                                                },
+                                                "template_field_id": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "value": {
+                                                    "type": "string",
+                                                    "example": "New Value"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DataCollectionResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "A valid authentication token was not provided with the request"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/1.0/acts/{uuid}/data/{dataId}": {
+            "put": {
+                "tags": [
+                    "Acts"
+                ],
+                "summary": "Update a single data point",
+                "description": "Update a single data point.",
+                "operationId": "updateActData",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "The UUID of the act",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "123e4567-e89b-12d3-a456-426614174000"
+                        }
+                    },
+                    {
+                        "name": "dataId",
+                        "in": "path",
+                        "description": "The ID of the data point",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 100
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "value": {
+                                        "type": "string",
+                                        "example": "New Value"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DataResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "A valid authentication token was not provided with the request"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/1.0/clients": {
             "get": {
                 "tags": [
@@ -463,6 +648,274 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ClientResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "A valid authentication token was not provided with the request"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/1.0/clients/by-org-number/{orgNumber}": {
+            "get": {
+                "tags": [
+                    "Clients"
+                ],
+                "summary": "Get clients by organization number",
+                "description": "Get client(s) by organization number.",
+                "operationId": "getClientsByOrgNumber",
+                "parameters": [
+                    {
+                        "name": "orgNumber",
+                        "in": "path",
+                        "description": "The organization number",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "5569123456"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ClientResource"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "A valid authentication token was not provided with the request"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/1.0/clients/{id}/acts/latest": {
+            "get": {
+                "tags": [
+                    "Clients"
+                ],
+                "summary": "Get latest act for a client",
+                "description": "Get latest act for a client.",
+                "operationId": "getLatestAct",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The id of the client",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 12345
+                        }
+                    },
+                    {
+                        "name": "template_id",
+                        "in": "query",
+                        "description": "Optional template ID to filter by",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 5
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "A valid authentication token was not provided with the request"
+                    },
+                    "404": {
+                        "description": "No act found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/1.0/clients/by-org-number/{orgNumber}/acts/latest": {
+            "get": {
+                "tags": [
+                    "Clients"
+                ],
+                "summary": "Get latest act by organization number",
+                "description": "Get latest act by organization number.",
+                "operationId": "getLatestActByOrgNumber",
+                "parameters": [
+                    {
+                        "name": "orgNumber",
+                        "in": "path",
+                        "description": "The organization number",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "5569123456"
+                        }
+                    },
+                    {
+                        "name": "template_id",
+                        "in": "query",
+                        "description": "Optional template ID to filter by",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 5
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "A valid authentication token was not provided with the request"
+                    },
+                    "404": {
+                        "description": "No client or act found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/1.0/templates": {
+            "get": {
+                "tags": [
+                    "Templates"
+                ],
+                "summary": "Gets a list of templates",
+                "description": "Display a listing of the resource.",
+                "operationId": "getTemplates",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "The number of templates to return",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 10,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "The page number to return",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/TemplateCollectionResource"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "A valid authentication token was not provided with the request"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/1.0/templates/{id}": {
+            "get": {
+                "tags": [
+                    "Templates"
+                ],
+                "summary": "Get a template with full structure",
+                "description": "Display the specified template.",
+                "operationId": "getTemplate",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The id of the template",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 12345
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TemplateResource"
                                 }
                             }
                         }
@@ -642,6 +1095,10 @@
                         "type": "integer",
                         "example": "12345"
                     },
+                    "template_name": {
+                        "type": "string",
+                        "example": "KYC Template"
+                    },
                     "amount": {
                         "type": "integer",
                         "example": "10000"
@@ -789,6 +1246,195 @@
                     }
                 },
                 "type": "object"
+            },
+            "DataCollectionResource": {
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DataResource"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "DataResource": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 100
+                    },
+                    "template_field_id": {
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Company Name"
+                    },
+                    "type": {
+                        "type": "string",
+                        "example": "text"
+                    },
+                    "value": {
+                        "type": "string",
+                        "example": "Acme AB"
+                    },
+                    "required": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "section_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "tab_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "order": {
+                        "type": "integer",
+                        "example": 1
+                    }
+                },
+                "type": "object"
+            },
+            "TemplateCollectionResource": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "KYC Template"
+                    },
+                    "country": {
+                        "type": "string",
+                        "example": "SE"
+                    },
+                    "language": {
+                        "type": "string",
+                        "example": "sv"
+                    },
+                    "created_at": {
+                        "description": "The date when this template was created",
+                        "type": "string",
+                        "example": "2024-01-01T00:00:00Z"
+                    },
+                    "updated_at": {
+                        "description": "The date when this template was last updated",
+                        "type": "string",
+                        "example": "2024-01-01T00:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "TemplateFieldResource": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Company Name"
+                    },
+                    "type": {
+                        "type": "string",
+                        "example": "text"
+                    },
+                    "required": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "options": {
+                        "type": "object",
+                        "example": "{}"
+                    },
+                    "order": {
+                        "type": "integer",
+                        "example": 1
+                    }
+                },
+                "type": "object"
+            },
+            "TemplateResource": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "KYC Template"
+                    },
+                    "country": {
+                        "type": "string",
+                        "example": "SE"
+                    },
+                    "language": {
+                        "type": "string",
+                        "example": "sv"
+                    },
+                    "tabs": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "id": {
+                                    "type": "integer",
+                                    "example": 1
+                                },
+                                "name": {
+                                    "type": "string",
+                                    "example": "Basic Info"
+                                },
+                                "order": {
+                                    "type": "integer",
+                                    "example": 1
+                                },
+                                "sections": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "example": "Company Details"
+                                            },
+                                            "order": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "fields": {
+                                                "type": "array",
+                                                "items": {
+                                                    "$ref": "#/components/schemas/TemplateFieldResource"
+                                                }
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "created_at": {
+                        "description": "The date when this template was created",
+                        "type": "string",
+                        "example": "2024-01-01T00:00:00Z"
+                    },
+                    "updated_at": {
+                        "description": "The date when this template was last updated",
+                        "type": "string",
+                        "example": "2024-01-01T00:00:00Z"
+                    }
+                },
+                "type": "object"
             }
         },
         "securitySchemes": {
@@ -814,6 +1460,10 @@
         {
             "name": "Clients",
             "description": "Operations related to clients"
+        },
+        {
+            "name": "Templates",
+            "description": "Operations related to act templates"
         }
     ]
 }
