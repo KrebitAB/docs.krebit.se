@@ -428,24 +428,29 @@
                     }
                 ],
                 "requestBody": {
+                    "description": "Updates multiple data points in a single request. Each item must include either id or template_field_id.",
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "properties": {
                                     "data": {
+                                        "description": "List of data point updates for this act.",
                                         "type": "array",
                                         "items": {
                                             "properties": {
                                                 "id": {
+                                                    "description": "The data point ID from the act data list. Use either id or template_field_id.",
                                                     "type": "integer",
                                                     "example": 100
                                                 },
                                                 "template_field_id": {
+                                                    "description": "The template field ID to locate the data point. Use either id or template_field_id.",
                                                     "type": "integer",
                                                     "example": 10
                                                 },
                                                 "value": {
+                                                    "description": "The new value for the data point. Validation rules depend on the field type.",
                                                     "type": "string",
                                                     "example": "New Value"
                                                 }
@@ -513,12 +518,14 @@
                     }
                 ],
                 "requestBody": {
+                    "description": "Updates a single data point value by ID.",
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "properties": {
                                     "value": {
+                                        "description": "The new value for the data point. Validation rules depend on the field type.",
                                         "type": "string",
                                         "example": "New Value"
                                     }
@@ -1043,27 +1050,33 @@
             "ActCollectionResource": {
                 "properties": {
                     "uuid": {
+                        "description": "The unique identifier of the act.",
                         "type": "string",
                         "format": "uuid",
                         "example": "123e4567-e89b-12d3-a456-426614174000"
                     },
                     "client_id": {
+                        "description": "The client ID this act belongs to.",
                         "type": "integer",
                         "example": "12345"
                     },
                     "template_id": {
+                        "description": "The template ID used to create the act.",
                         "type": "integer",
                         "example": "12345"
                     },
                     "amount": {
+                        "description": "The requested or approved amount for the act.",
                         "type": "integer",
                         "example": "10000"
                     },
                     "currency": {
+                        "description": "The ISO currency code for the amount.",
                         "type": "string",
                         "example": "SEK"
                     },
                     "language": {
+                        "description": "The language code for the act.",
                         "type": "string",
                         "example": "SV"
                     },
@@ -1083,31 +1096,38 @@
             "ActResource": {
                 "properties": {
                     "uuid": {
+                        "description": "The unique identifier of the act.",
                         "type": "string",
                         "format": "uuid",
                         "example": "123e4567-e89b-12d3-a456-426614174000"
                     },
                     "client_id": {
+                        "description": "The client ID this act belongs to.",
                         "type": "integer",
                         "example": "12345"
                     },
                     "template_id": {
+                        "description": "The template ID used to create the act.",
                         "type": "integer",
                         "example": "12345"
                     },
                     "template_name": {
+                        "description": "The template name used to create the act.",
                         "type": "string",
                         "example": "KYC Template"
                     },
                     "amount": {
+                        "description": "The requested or approved amount for the act.",
                         "type": "integer",
                         "example": "10000"
                     },
                     "currency": {
+                        "description": "The ISO currency code for the amount.",
                         "type": "string",
                         "example": "SEK"
                     },
                     "language": {
+                        "description": "The language code for the act.",
                         "type": "string",
                         "example": "SV"
                     },
@@ -1250,6 +1270,7 @@
             "DataCollectionResource": {
                 "properties": {
                     "data": {
+                        "description": "A list of data points for the act.",
                         "type": "array",
                         "items": {
                             "$ref": "#/components/schemas/DataResource"
@@ -1261,38 +1282,47 @@
             "DataResource": {
                 "properties": {
                     "id": {
+                        "description": "The data point ID within the act.",
                         "type": "integer",
                         "example": 100
                     },
                     "template_field_id": {
+                        "description": "The template field ID this data point is derived from.",
                         "type": "integer",
                         "example": 10
                     },
                     "name": {
+                        "description": "The field label as defined in the template.",
                         "type": "string",
                         "example": "Company Name"
                     },
                     "type": {
+                        "description": "The field type used to validate and render the value.",
                         "type": "string",
                         "example": "text"
                     },
                     "value": {
+                        "description": "The stored value for the data point.",
                         "type": "string",
                         "example": "Acme AB"
                     },
                     "required": {
+                        "description": "Whether the field is required in the template.",
                         "type": "boolean",
                         "example": true
                     },
                     "section_id": {
+                        "description": "The section ID the field belongs to.",
                         "type": "integer",
                         "example": 1
                     },
                     "tab_id": {
+                        "description": "The tab ID the field belongs to.",
                         "type": "integer",
                         "example": 1
                     },
                     "order": {
+                        "description": "The position of the field within its section.",
                         "type": "integer",
                         "example": 1
                     }
@@ -1302,18 +1332,22 @@
             "TemplateCollectionResource": {
                 "properties": {
                     "id": {
+                        "description": "The template ID.",
                         "type": "integer",
                         "example": 1
                     },
                     "name": {
+                        "description": "The template name.",
                         "type": "string",
                         "example": "KYC Template"
                     },
                     "country": {
+                        "description": "The country code the template is associated with.",
                         "type": "string",
                         "example": "SE"
                     },
                     "language": {
+                        "description": "The language code used by the template.",
                         "type": "string",
                         "example": "sv"
                     },
@@ -1333,26 +1367,32 @@
             "TemplateFieldResource": {
                 "properties": {
                     "id": {
+                        "description": "The template field ID.",
                         "type": "integer",
                         "example": 10
                     },
                     "name": {
+                        "description": "The field label shown to users.",
                         "type": "string",
                         "example": "Company Name"
                     },
                     "type": {
+                        "description": "The field type used to validate input.",
                         "type": "string",
                         "example": "text"
                     },
                     "required": {
+                        "description": "Whether the field is required.",
                         "type": "boolean",
                         "example": true
                     },
                     "options": {
+                        "description": "Field options such as select values or validation settings.",
                         "type": "object",
                         "example": "{}"
                     },
                     "order": {
+                        "description": "The field order within its section.",
                         "type": "integer",
                         "example": 1
                     }
@@ -1362,54 +1402,67 @@
             "TemplateResource": {
                 "properties": {
                     "id": {
+                        "description": "The template ID.",
                         "type": "integer",
                         "example": 1
                     },
                     "name": {
+                        "description": "The template name.",
                         "type": "string",
                         "example": "KYC Template"
                     },
                     "country": {
+                        "description": "The country code the template is associated with.",
                         "type": "string",
                         "example": "SE"
                     },
                     "language": {
+                        "description": "The language code used by the template.",
                         "type": "string",
                         "example": "sv"
                     },
                     "tabs": {
+                        "description": "Ordered tabs that make up the template structure.",
                         "type": "array",
                         "items": {
                             "properties": {
                                 "id": {
+                                    "description": "The tab ID.",
                                     "type": "integer",
                                     "example": 1
                                 },
                                 "name": {
+                                    "description": "The tab name.",
                                     "type": "string",
                                     "example": "Basic Info"
                                 },
                                 "order": {
+                                    "description": "The tab order in the template.",
                                     "type": "integer",
                                     "example": 1
                                 },
                                 "sections": {
+                                    "description": "Ordered sections within the tab.",
                                     "type": "array",
                                     "items": {
                                         "properties": {
                                             "id": {
+                                                "description": "The section ID.",
                                                 "type": "integer",
                                                 "example": 1
                                             },
                                             "name": {
+                                                "description": "The section name.",
                                                 "type": "string",
                                                 "example": "Company Details"
                                             },
                                             "order": {
+                                                "description": "The section order within the tab.",
                                                 "type": "integer",
                                                 "example": 1
                                             },
                                             "fields": {
+                                                "description": "Ordered fields within the section.",
                                                 "type": "array",
                                                 "items": {
                                                     "$ref": "#/components/schemas/TemplateFieldResource"
