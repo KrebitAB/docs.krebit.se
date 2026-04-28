@@ -11,8 +11,8 @@
             "description": "Krebit Finance API server",
             "variables": {
                 "organization": {
-                    "default": "{organization}",
-                    "description": "The organization to use"
+                    "default": "krebit",
+                    "description": "Organization subdomain"
                 }
             }
         }
