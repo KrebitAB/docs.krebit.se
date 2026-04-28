@@ -743,6 +743,22 @@
                             "type": "integer",
                             "example": 5
                         }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Optional status to filter by (approved, rejected, in_progress, draft). Also affects ordering: approved orders by approved_at, rejected by rejected_at, others by created_at",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "approved",
+                                "rejected",
+                                "in_progress",
+                                "draft"
+                            ],
+                            "example": "approved"
+                        }
                     }
                 ],
                 "responses": {
@@ -797,6 +813,22 @@
                         "schema": {
                             "type": "integer",
                             "example": 5
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Optional status to filter by (approved, rejected, in_progress, draft). Also affects ordering: approved orders by approved_at, rejected by rejected_at, others by created_at",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "approved",
+                                "rejected",
+                                "in_progress",
+                                "draft"
+                            ],
+                            "example": "approved"
                         }
                     }
                 ],
@@ -1130,6 +1162,11 @@
                         "description": "The language code for the act.",
                         "type": "string",
                         "example": "SV"
+                    },
+                    "status": {
+                        "description": "The current status of the act.",
+                        "type": "string",
+                        "example": "in_progress"
                     },
                     "created_at": {
                         "description": "The date when this act was created",
@@ -1485,6 +1522,90 @@
                         "description": "The date when this template was last updated",
                         "type": "string",
                         "example": "2024-01-01T00:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "WebhookFinanceActResource": {
+                "properties": {
+                    "uuid": {
+                        "description": "The unique identifier of the act.",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "123e4567-e89b-12d3-a456-426614174000"
+                    },
+                    "client_id": {
+                        "description": "The client ID this act belongs to.",
+                        "type": "integer",
+                        "example": "12345"
+                    },
+                    "client": {
+                        "$ref": "#/components/schemas/WebhookFinanceClientResource"
+                    },
+                    "template_id": {
+                        "description": "The template ID used to create the act.",
+                        "type": "integer",
+                        "example": "12345"
+                    },
+                    "template_name": {
+                        "description": "The template name used to create the act.",
+                        "type": "string",
+                        "example": "KYC Template"
+                    },
+                    "amount": {
+                        "description": "The requested or approved amount for the act.",
+                        "type": "integer",
+                        "example": "10000"
+                    },
+                    "currency": {
+                        "description": "The ISO currency code for the amount.",
+                        "type": "string",
+                        "example": "SEK"
+                    },
+                    "language": {
+                        "description": "The language code for the act.",
+                        "type": "string",
+                        "example": "SV"
+                    },
+                    "status": {
+                        "description": "The current status of the act.",
+                        "type": "string",
+                        "example": "in_progress"
+                    },
+                    "created_at": {
+                        "description": "The date when this act was created",
+                        "type": "string",
+                        "example": "2021-09-01T12:00:00Z"
+                    },
+                    "updated_at": {
+                        "description": "The date when this act was last updated",
+                        "type": "string",
+                        "example": "2021-09-01T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "WebhookFinanceClientResource": {
+                "properties": {
+                    "id": {
+                        "description": "The client ID.",
+                        "type": "integer",
+                        "example": 12345
+                    },
+                    "company_name": {
+                        "description": "The name of the client.",
+                        "type": "string",
+                        "example": "Krebit AB"
+                    },
+                    "org_number": {
+                        "description": "The organization number of the client.",
+                        "type": "string",
+                        "example": "5566778899"
+                    },
+                    "country": {
+                        "description": "The country of the client.",
+                        "type": "string",
+                        "example": "SE"
                     }
                 },
                 "type": "object"
