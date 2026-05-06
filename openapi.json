@@ -1548,7 +1548,7 @@
                         "nullable": true
                     },
                     "user": {
-                        "$ref": "#/components/schemas/FinanceUserSummaryResource"
+                        "$ref": "#/components/schemas/UserSummaryResource"
                     },
                     "created_at": {
                         "description": "The date when the activity was created.",
@@ -1827,7 +1827,7 @@
                     "decision_maker": {
                         "oneOf": [
                             {
-                                "$ref": "#/components/schemas/FinanceUserSummaryResource"
+                                "$ref": "#/components/schemas/UserSummaryResource"
                             }
                         ],
                         "nullable": true,
@@ -2039,7 +2039,7 @@
                 },
                 "type": "object"
             },
-            "FinanceUserSummaryResource": {
+            "UserSummaryResource": {
                 "properties": {
                     "id": {
                         "description": "The user ID.",
@@ -2059,7 +2059,7 @@
                 },
                 "type": "object"
             },
-            "WebhookFinanceActResource": {
+            "WebhookActResource": {
                 "properties": {
                     "uuid": {
                         "description": "The unique identifier of the act.",
@@ -2073,7 +2073,7 @@
                         "example": "12345"
                     },
                     "client": {
-                        "$ref": "#/components/schemas/WebhookFinanceClientResource"
+                        "$ref": "#/components/schemas/WebhookClientResource"
                     },
                     "template_id": {
                         "description": "The template ID used to create the act.",
@@ -2118,7 +2118,7 @@
                 },
                 "type": "object"
             },
-            "WebhookFinanceClientResource": {
+            "WebhookClientResource": {
                 "properties": {
                     "id": {
                         "description": "The client ID.",
