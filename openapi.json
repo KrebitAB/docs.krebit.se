@@ -417,6 +417,208 @@
                 ]
             }
         },
+        "/api/1.0/acts/{uuid}/activities": {
+            "get": {
+                "tags": [
+                    "Acts"
+                ],
+                "summary": "Get all top-level activities from an act",
+                "description": "Get all top-level activities from an act.",
+                "operationId": "getActActivities",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "The UUID of the act",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "123e4567-e89b-12d3-a456-426614174000"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ActActivityResource"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "A valid authentication token was not provided with the request"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/1.0/acts/{uuid}/decisions": {
+            "get": {
+                "tags": [
+                    "Acts"
+                ],
+                "summary": "Get the decision summary and participant votes from an act",
+                "description": "Get the decision summary and participant votes from an act.",
+                "operationId": "getActDecisions",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "The UUID of the act",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "123e4567-e89b-12d3-a456-426614174000"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActDecisionSummaryResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "A valid authentication token was not provided with the request"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/1.0/acts/{uuid}/attachments": {
+            "get": {
+                "tags": [
+                    "Acts"
+                ],
+                "summary": "Get all attachments from an act",
+                "description": "Get all attachments from an act.",
+                "operationId": "getActAttachments",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "The UUID of the act",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "123e4567-e89b-12d3-a456-426614174000"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ActAttachmentResource"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "A valid authentication token was not provided with the request"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/1.0/acts/{uuid}/attachments/{attachmentId}/download": {
+            "get": {
+                "tags": [
+                    "Acts"
+                ],
+                "summary": "Download an attachment from an act",
+                "description": "Download an attachment from an act.",
+                "operationId": "downloadActAttachment",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "The UUID of the act",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "example": "123e4567-e89b-12d3-a456-426614174000"
+                        }
+                    },
+                    {
+                        "name": "attachmentId",
+                        "in": "path",
+                        "description": "The attachment ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 100
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/octet-stream": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "A valid authentication token was not provided with the request"
+                    },
+                    "404": {
+                        "description": "Attachment not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/1.0/acts/{uuid}/data": {
             "get": {
                 "tags": [
@@ -1329,6 +1531,89 @@
                 },
                 "type": "object"
             },
+            "ActActivityResource": {
+                "properties": {
+                    "id": {
+                        "description": "The activity ID.",
+                        "type": "integer",
+                        "example": 12345
+                    },
+                    "action": {
+                        "description": "The activity action.",
+                        "type": "string",
+                        "example": "credit_act_forwarded"
+                    },
+                    "data": {
+                        "description": "Optional activity payload.",
+                        "nullable": true
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/FinanceUserSummaryResource"
+                    },
+                    "created_at": {
+                        "description": "The date when the activity was created.",
+                        "type": "string",
+                        "example": "2021-09-01T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "ActAttachmentResource": {
+                "properties": {
+                    "id": {
+                        "description": "The attachment ID.",
+                        "type": "integer",
+                        "example": 12345
+                    },
+                    "name": {
+                        "description": "The attachment file name.",
+                        "type": "string",
+                        "example": "annual-report.pdf"
+                    },
+                    "type": {
+                        "description": "The stored attachment file type.",
+                        "type": "string",
+                        "example": "pdf",
+                        "nullable": true
+                    },
+                    "include_in_pdf_export": {
+                        "description": "Whether the attachment is included in PDF exports.",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "uploaded_after_decision": {
+                        "description": "Whether the attachment was uploaded after the act decision.",
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "can_be_included_in_pdf_export": {
+                        "description": "Whether the attachment type can be included in PDF exports.",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "order": {
+                        "description": "The attachment display order.",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "download_url": {
+                        "description": "The API URL used to download this attachment.",
+                        "type": "string",
+                        "example": "https://krebit.example/api/1.0/acts/123e4567-e89b-12d3-a456-426614174000/attachments/12345/download"
+                    },
+                    "created_at": {
+                        "description": "The date when the attachment was created.",
+                        "type": "string",
+                        "example": "2021-09-01T12:00:00Z"
+                    },
+                    "updated_at": {
+                        "description": "The date when the attachment was last updated.",
+                        "type": "string",
+                        "example": "2021-09-01T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
             "ClientCollectionResource": {
                 "properties": {
                     "id": {
@@ -1514,6 +1799,86 @@
                 },
                 "type": "object"
             },
+            "ActDecisionSummaryResource": {
+                "properties": {
+                    "status": {
+                        "description": "The current act status.",
+                        "type": "string",
+                        "example": "approved"
+                    },
+                    "result": {
+                        "description": "The final decision result.",
+                        "type": "string",
+                        "example": "approved",
+                        "nullable": true
+                    },
+                    "decided_at": {
+                        "description": "The date when the act was approved or rejected.",
+                        "type": "string",
+                        "example": "2021-09-01T12:00:00Z",
+                        "nullable": true
+                    },
+                    "decision_comment": {
+                        "description": "The act decision comment.",
+                        "type": "string",
+                        "example": "Approved by committee.",
+                        "nullable": true
+                    },
+                    "decision_maker": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/FinanceUserSummaryResource"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "The user that made the final decision."
+                    },
+                    "votes": {
+                        "description": "Participant votes recorded for the decision.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ActDecisionVoteResource"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "ActDecisionVoteResource": {
+                "properties": {
+                    "id": {
+                        "description": "The vote ID.",
+                        "type": "integer",
+                        "example": 12345
+                    },
+                    "person_name": {
+                        "description": "The participant name.",
+                        "type": "string",
+                        "example": "Jane Doe"
+                    },
+                    "decision": {
+                        "description": "The participant decision.",
+                        "type": "string",
+                        "example": "approve",
+                        "nullable": true
+                    },
+                    "present": {
+                        "description": "Whether the participant was present.",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "created_at": {
+                        "description": "The date when the vote was created.",
+                        "type": "string",
+                        "example": "2021-09-01T12:00:00Z"
+                    },
+                    "updated_at": {
+                        "description": "The date when the vote was last updated.",
+                        "type": "string",
+                        "example": "2021-09-01T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
             "TemplateCollectionResource": {
                 "properties": {
                     "id": {
@@ -1670,6 +2035,26 @@
                         "description": "The date when this template was last updated",
                         "type": "string",
                         "example": "2024-01-01T00:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "FinanceUserSummaryResource": {
+                "properties": {
+                    "id": {
+                        "description": "The user ID.",
+                        "type": "integer",
+                        "example": 12345
+                    },
+                    "name": {
+                        "description": "The user name.",
+                        "type": "string",
+                        "example": "Jane Doe"
+                    },
+                    "email": {
+                        "description": "The user email address.",
+                        "type": "string",
+                        "example": "jane.doe@example.com"
                     }
                 },
                 "type": "object"
