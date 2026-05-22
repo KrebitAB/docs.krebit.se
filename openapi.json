@@ -1,14 +1,14 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "Krebit Finance API documentation",
-        "description": "This is the API documentation for the Krebit Finance API",
+        "title": "Krebit Finance",
+        "description": "API documentation for Krebit Finance",
         "version": "1.0.0"
     },
     "servers": [
         {
             "url": "https://{organization}.krebit.se",
-            "description": "Krebit Finance API server",
+            "description": "API server",
             "variables": {
                 "organization": {
                     "default": "krebit",
@@ -682,7 +682,7 @@
                     }
                 ],
                 "requestBody": {
-                    "description": "Updates multiple data points in a single request. Each item must include either id or template_field_id.",
+                    "description": "Updates multiple data points in a single request. Each item must include id, template_field_id, or template_field_key.",
                     "required": true,
                     "content": {
                         "application/json": {
@@ -699,9 +699,14 @@
                                                     "example": 100
                                                 },
                                                 "template_field_id": {
-                                                    "description": "The template field ID to locate the data point. Use either id or template_field_id.",
+                                                    "description": "The template field ID to locate the data point. Use id, template_field_id, or template_field_key.",
                                                     "type": "integer",
                                                     "example": 10
+                                                },
+                                                "template_field_key": {
+                                                    "description": "The reusable template field key to locate the data point. Use id, template_field_id, or template_field_key.",
+                                                    "type": "string",
+                                                    "example": "companyName"
                                                 },
                                                 "value": {
                                                     "description": "The new value for the data point. Validation rules depend on the field type.",
@@ -1761,6 +1766,17 @@
                         "type": "integer",
                         "example": 10
                     },
+                    "template_field_key": {
+                        "description": "Optional reusable key copied from the template field.",
+                        "type": "string",
+                        "example": "companyName",
+                        "nullable": true
+                    },
+                    "external_data_field": {
+                        "description": "Whether this data point can receive an initial source value through the API.",
+                        "type": "boolean",
+                        "example": false
+                    },
                     "name": {
                         "description": "The field label as defined in the template.",
                         "type": "string",
@@ -1925,6 +1941,17 @@
                         "description": "The field label shown to users.",
                         "type": "string",
                         "example": "Company Name"
+                    },
+                    "field_key": {
+                        "description": "Optional reusable key for identifying equivalent fields across templates.",
+                        "type": "string",
+                        "example": "companyName",
+                        "nullable": true
+                    },
+                    "external_data_field": {
+                        "description": "Whether the field can receive an initial source value through the API.",
+                        "type": "boolean",
+                        "example": false
                     },
                     "type": {
                         "description": "The field type used to validate input.",
