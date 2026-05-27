@@ -141,21 +141,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/WebhookCollectionResource"
-                                            }
-                                        },
-                                        "links": {
-                                            "type": "object"
-                                        },
-                                        "meta": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
+                                    "$ref": "#/components/schemas/WebhookCollectionResponse"
                                 }
                             }
                         }
@@ -194,18 +180,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/WebhookResource",
-                                            "description": "Details of the created webhook."
-                                        },
-                                        "secret": {
-                                            "description": "The secret key used to validate signatures in webhook calls.",
-                                            "type": "string",
-                                            "example": "48ez4Rjz7pt2jguhuBHpoIm7rfKGGv1KxiG8UWRB"
-                                        }
-                                    },
-                                    "type": "object"
+                                    "$ref": "#/components/schemas/WebhookCreatedResponse"
                                 }
                             }
                         }
@@ -1350,6 +1325,46 @@
                     "message": {
                         "type": "string",
                         "example": "The authorization grant is invalid."
+                    }
+                },
+                "type": "object"
+            },
+            "WebhookCollectionResponse": {
+                "required": [
+                    "data",
+                    "links",
+                    "meta"
+                ],
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/WebhookCollectionResource"
+                        }
+                    },
+                    "links": {
+                        "type": "object"
+                    },
+                    "meta": {
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "WebhookCreatedResponse": {
+                "required": [
+                    "data",
+                    "secret"
+                ],
+                "properties": {
+                    "data": {
+                        "$ref": "#/components/schemas/WebhookResource",
+                        "description": "Details of the created webhook."
+                    },
+                    "secret": {
+                        "description": "The secret key used to validate signatures in webhook calls.",
+                        "type": "string",
+                        "example": "48ez4Rjz7pt2jguhuBHpoIm7rfKGGv1KxiG8UWRB"
                     }
                 },
                 "type": "object"
