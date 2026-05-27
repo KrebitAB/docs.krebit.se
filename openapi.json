@@ -1,5 +1,5 @@
 {
-    "openapi": "3.0.0",
+    "openapi": "3.2.0",
     "info": {
         "title": "Krebit Finance",
         "description": "API documentation for Krebit Finance",
@@ -196,7 +196,8 @@
                                 "schema": {
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/components/schemas/WebhookResource"
+                                            "$ref": "#/components/schemas/WebhookResource",
+                                            "description": "Details of the created webhook."
                                         },
                                         "secret": {
                                             "description": "The secret key used to validate signatures in webhook calls.",
@@ -1010,13 +1011,13 @@
                         "required": false,
                         "schema": {
                             "type": "string",
+                            "example": "approved",
                             "enum": [
                                 "approved",
                                 "rejected",
                                 "in_progress",
                                 "draft"
-                            ],
-                            "example": "approved"
+                            ]
                         }
                     }
                 ],
@@ -1081,13 +1082,13 @@
                         "required": false,
                         "schema": {
                             "type": "string",
+                            "example": "approved",
                             "enum": [
                                 "approved",
                                 "rejected",
                                 "in_progress",
                                 "draft"
-                            ],
-                            "example": "approved"
+                            ]
                         }
                     }
                 ],
@@ -1232,6 +1233,31 @@
     },
     "components": {
         "schemas": {
+            "WebhookEventEnvelope": {
+                "required": [
+                    "id",
+                    "event",
+                    "data"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Unique identifier for this webhook event.",
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "d3b3b3b3-3b3b-3b3b-3b3b-3b3b3b3b3b3b"
+                    },
+                    "event": {
+                        "description": "Name of the webhook event.",
+                        "type": "string",
+                        "example": "event.name"
+                    },
+                    "data": {
+                        "description": "Event-specific payload.",
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
             "OAuthTokenRequest": {
                 "required": [
                     "grant_type",
@@ -1241,11 +1267,11 @@
                     "grant_type": {
                         "description": "Use authorization_code to exchange an authorization code, or refresh_token to refresh an access token.",
                         "type": "string",
+                        "example": "authorization_code",
                         "enum": [
                             "authorization_code",
                             "refresh_token"
-                        ],
-                        "example": "authorization_code"
+                        ]
                     },
                     "client_id": {
                         "description": "The OAuth client ID.",
@@ -1434,6 +1460,112 @@
                 },
                 "type": "object"
             },
+            "ActCreatedWebhookData": {
+                "required": [
+                    "act"
+                ],
+                "properties": {
+                    "act": {
+                        "$ref": "#/components/schemas/WebhookActResource"
+                    }
+                },
+                "type": "object"
+            },
+            "ActCreatedWebhookPayload": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/WebhookEventEnvelope"
+                    },
+                    {
+                        "required": [
+                            "event",
+                            "data"
+                        ],
+                        "properties": {
+                            "event": {
+                                "type": "string",
+                                "example": "act.created",
+                                "const": "act.created"
+                            },
+                            "data": {
+                                "$ref": "#/components/schemas/ActCreatedWebhookData"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "ActStatusChangedWebhookData": {
+                "required": [
+                    "act",
+                    "previous_status",
+                    "status",
+                    "previous_attestation_flow_step_id",
+                    "attestation_flow_step_id"
+                ],
+                "properties": {
+                    "act": {
+                        "$ref": "#/components/schemas/WebhookActResource"
+                    },
+                    "previous_status": {
+                        "description": "Status before the change.",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "draft"
+                    },
+                    "status": {
+                        "description": "Status after the change.",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "in_progress"
+                    },
+                    "previous_attestation_flow_step_id": {
+                        "description": "Attestation flow step ID before the change.",
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "example": 12
+                    },
+                    "attestation_flow_step_id": {
+                        "description": "Attestation flow step ID after the change.",
+                        "type": [
+                            "integer",
+                            "null"
+                        ],
+                        "example": 13
+                    }
+                },
+                "type": "object"
+            },
+            "ActStatusChangedWebhookPayload": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/WebhookEventEnvelope"
+                    },
+                    {
+                        "required": [
+                            "event",
+                            "data"
+                        ],
+                        "properties": {
+                            "event": {
+                                "type": "string",
+                                "example": "act.status_changed",
+                                "const": "act.status_changed"
+                            },
+                            "data": {
+                                "$ref": "#/components/schemas/ActStatusChangedWebhookData"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
             "ActCollectionResource": {
                 "properties": {
                     "uuid": {
@@ -1549,11 +1681,11 @@
                         "example": "credit_act_forwarded"
                     },
                     "data": {
-                        "description": "Optional activity payload.",
-                        "nullable": true
+                        "description": "Optional activity payload."
                     },
                     "user": {
-                        "$ref": "#/components/schemas/UserSummaryResource"
+                        "$ref": "#/components/schemas/UserSummaryResource",
+                        "description": "The user that created the activity."
                     },
                     "created_at": {
                         "description": "The date when the activity was created.",
@@ -1577,9 +1709,11 @@
                     },
                     "type": {
                         "description": "The stored attachment file type.",
-                        "type": "string",
-                        "example": "pdf",
-                        "nullable": true
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "pdf"
                     },
                     "include_in_pdf_export": {
                         "description": "Whether the attachment is included in PDF exports.",
@@ -1768,9 +1902,11 @@
                     },
                     "template_field_key": {
                         "description": "Optional reusable key copied from the template field.",
-                        "type": "string",
-                        "example": "companyName",
-                        "nullable": true
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "companyName"
                     },
                     "external_data_field": {
                         "description": "Whether this data point can receive an initial source value through the API.",
@@ -1824,29 +1960,38 @@
                     },
                     "result": {
                         "description": "The final decision result.",
-                        "type": "string",
-                        "example": "approved",
-                        "nullable": true
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "approved"
                     },
                     "decided_at": {
                         "description": "The date when the act was approved or rejected.",
-                        "type": "string",
-                        "example": "2021-09-01T12:00:00Z",
-                        "nullable": true
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "2021-09-01T12:00:00Z"
                     },
                     "decision_comment": {
                         "description": "The act decision comment.",
-                        "type": "string",
-                        "example": "Approved by committee.",
-                        "nullable": true
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "Approved by committee."
                     },
                     "decision_maker": {
                         "oneOf": [
                             {
-                                "$ref": "#/components/schemas/UserSummaryResource"
+                                "$ref": "#/components/schemas/UserSummaryResource",
+                                "description": "The user that made the final decision."
+                            },
+                            {
+                                "type": "null"
                             }
                         ],
-                        "nullable": true,
                         "description": "The user that made the final decision."
                     },
                     "votes": {
@@ -1873,9 +2018,11 @@
                     },
                     "decision": {
                         "description": "The participant decision.",
-                        "type": "string",
-                        "example": "approve",
-                        "nullable": true
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "approve"
                     },
                     "present": {
                         "description": "Whether the participant was present.",
@@ -1944,9 +2091,11 @@
                     },
                     "field_key": {
                         "description": "Optional reusable key for identifying equivalent fields across templates.",
-                        "type": "string",
-                        "example": "companyName",
-                        "nullable": true
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "companyName"
                     },
                     "external_data_field": {
                         "description": "Whether the field can receive an initial source value through the API.",
@@ -2100,7 +2249,8 @@
                         "example": "12345"
                     },
                     "client": {
-                        "$ref": "#/components/schemas/WebhookClientResource"
+                        "$ref": "#/components/schemas/WebhookClientResource",
+                        "description": "The client this act belongs to."
                     },
                     "template_id": {
                         "description": "The template ID used to create the act.",
@@ -2171,6 +2321,49 @@
                 "type": "object"
             }
         },
+        "parameters": {
+            "WebhookSignatureHeader": {
+                "name": "X-Signature",
+                "in": "header",
+                "description": "HMAC SHA-256 signature of the JSON request body, generated with the webhook secret.",
+                "required": true,
+                "schema": {
+                    "type": "string",
+                    "example": "5f734a24766a8f01d4f40fbe91b1b93d69f43f58d7e8dcbb4d31ea35bf9f3f89"
+                }
+            },
+            "WebhookClientIdHeader": {
+                "name": "X-Client-Id",
+                "in": "header",
+                "description": "OAuth client ID associated with the webhook registration.",
+                "required": true,
+                "schema": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "d3b3b3b3-3b3b-3b3b-3b3b-3b3b3b3b3b3b"
+                }
+            },
+            "WebhookUserAgentHeader": {
+                "name": "User-Agent",
+                "in": "header",
+                "description": "Krebit webhook delivery user agent.",
+                "required": true,
+                "schema": {
+                    "type": "string",
+                    "example": "Krebit/1.0"
+                }
+            },
+            "WebhookContentTypeHeader": {
+                "name": "Content-Type",
+                "in": "header",
+                "description": "Webhook requests are delivered as JSON.",
+                "required": true,
+                "schema": {
+                    "type": "string",
+                    "example": "application/json"
+                }
+            }
+        },
         "securitySchemes": {
             "oauth2": {
                 "type": "oauth2",
@@ -2214,6 +2407,90 @@
         {
             "name": "Templates",
             "description": "Operations related to act templates"
+        },
+        {
+            "name": "Webhook events",
+            "description": "Webhook events"
         }
-    ]
+    ],
+    "webhooks": {
+        "act.created": {
+            "post": {
+                "tags": [
+                    "Webhook events"
+                ],
+                "summary": "Act created",
+                "description": "Krebit sends this event when a credit act is created.",
+                "operationId": "actCreatedWebhook",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/WebhookSignatureHeader"
+                    },
+                    {
+                        "$ref": "#/components/parameters/WebhookClientIdHeader"
+                    },
+                    {
+                        "$ref": "#/components/parameters/WebhookUserAgentHeader"
+                    },
+                    {
+                        "$ref": "#/components/parameters/WebhookContentTypeHeader"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ActCreatedWebhookPayload"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Return a non-4xx/non-5xx response to mark delivery successful."
+                    }
+                }
+            }
+        },
+        "act.status_changed": {
+            "post": {
+                "tags": [
+                    "Webhook events"
+                ],
+                "summary": "Act status changed",
+                "description": "Krebit sends this event when a credit act status changes.",
+                "operationId": "actStatusChangedWebhook",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/WebhookSignatureHeader"
+                    },
+                    {
+                        "$ref": "#/components/parameters/WebhookClientIdHeader"
+                    },
+                    {
+                        "$ref": "#/components/parameters/WebhookUserAgentHeader"
+                    },
+                    {
+                        "$ref": "#/components/parameters/WebhookContentTypeHeader"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ActStatusChangedWebhookPayload"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Return a non-4xx/non-5xx response to mark delivery successful."
+                    }
+                }
+            }
+        }
+    }
 }
