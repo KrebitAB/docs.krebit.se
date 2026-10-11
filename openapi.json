@@ -289,6 +289,17 @@
                 "operationId": "getActs",
                 "parameters": [
                     {
+                        "name": "case_type[]",
+                        "in": "query",
+                        "description": "Filter by case-type UUIDs, including inactive types. Use none for acts without a case type. Multiple values are matched with OR.",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
                         "name": "limit",
                         "in": "query",
                         "description": "The number of acts to return",
@@ -658,12 +669,17 @@
                     }
                 ],
                 "requestBody": {
-                    "description": "Updates multiple data points in a single request. Each item must include id, template_field_id, or template_field_key.",
+                    "description": "Updates multiple data points in a single request. Each item must include id, template_field_id, or template_field_key. With fetch_request_id, all items must be selected external fields. Correlated responses are validated together; conflicts return 409 without applying values. Retry only the unresolved subset. Send either value or error for each item.",
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "properties": {
+                                    "fetch_request_id": {
+                                        "description": "Correlation ID from act.fetch_data; applies to every submitted external field.",
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
                                     "data": {
                                         "description": "List of data point updates for this act.",
                                         "type": "array",
@@ -684,6 +700,11 @@
                                                     "type": "string",
                                                     "example": "companyName"
                                                 },
+                                                "error": {
+                                                    "description": "External fetch failure; send instead of value and only with fetch_request_id.",
+                                                    "type": "string",
+                                                    "maxLength": 1000
+                                                },
                                                 "value": {
                                                     "description": "The new value for the data point. Validation rules depend on the field type.",
                                                     "type": "string",
@@ -700,6 +721,9 @@
                     }
                 },
                 "responses": {
+                    "409": {
+                        "description": "A requested field changed, expired, or was already completed with another value. Identical completed values can be retried."
+                    },
                     "200": {
                         "description": "Successful operation",
                         "content": {
@@ -753,12 +777,22 @@
                     }
                 ],
                 "requestBody": {
-                    "description": "Updates a single data point value by ID.",
+                    "description": "Updates a data point by ID. Include fetch_request_id to complete a requested external source refresh. Send either value or error; a regular update without correlation retains the existing source behavior.",
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "properties": {
+                                    "fetch_request_id": {
+                                        "description": "Correlation ID from act.fetch_data. Required when sending an error.",
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "error": {
+                                        "description": "External fetch failure; mutually exclusive with value.",
+                                        "type": "string",
+                                        "maxLength": 1000
+                                    },
                                     "value": {
                                         "description": "The new value for the data point. Validation rules depend on the field type.",
                                         "type": "string",
@@ -771,6 +805,9 @@
                     }
                 },
                 "responses": {
+                    "409": {
+                        "description": "The requested field was changed, expired, or already completed with another value."
+                    },
                     "200": {
                         "description": "Successful operation",
                         "content": {
@@ -1380,6 +1417,7 @@
                         "example": "event"
                     },
                     "target": {
+                        "description": "An HTTPS webhook URL.",
                         "type": "string",
                         "example": "https://example.com/webhook"
                     }
@@ -1474,6 +1512,127 @@
                     }
                 },
                 "type": "object"
+            },
+            "FetchDataField": {
+                "required": [
+                    "id",
+                    "template_field_name",
+                    "type",
+                    "external_data_field",
+                    "source"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Act data-point ID; use this ID when returning a result.",
+                        "type": "integer"
+                    },
+                    "template_field_id": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "template_field_key": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "template_field_name": {
+                        "description": "Field name copied into the act, captured when the fetch was requested. Names are descriptive; match on IDs or keys.",
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "external_data_field": {
+                        "description": "Only these fields should be fulfilled by the receiving integration. Built-in fields are fetched by Krebit.",
+                        "type": "boolean"
+                    },
+                    "source": {
+                        "type": "string"
+                    },
+                    "tab_id": {
+                        "type": "integer"
+                    },
+                    "tab_name": {
+                        "type": "string"
+                    },
+                    "section_id": {
+                        "type": "integer"
+                    },
+                    "section_name": {
+                        "type": "string"
+                    },
+                    "options": {
+                        "description": "Effective field options, including the current columns for structured data.",
+                        "type": [
+                            "object",
+                            "null"
+                        ],
+                        "additionalProperties": true
+                    }
+                },
+                "type": "object"
+            },
+            "ActFetchDataWebhookData": {
+                "required": [
+                    "request_id",
+                    "requested_at",
+                    "expires_at",
+                    "act",
+                    "fields"
+                ],
+                "properties": {
+                    "request_id": {
+                        "description": "Stable correlation ID shared by every destination and retry for this fetch request.",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "requested_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "expires_at": {
+                        "description": "Deadline for returning results for this request.",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "act": {
+                        "$ref": "#/components/schemas/WebhookActResource"
+                    },
+                    "fields": {
+                        "description": "The complete selected field set, including built-in provider fields. This is a request snapshot, not fetched results.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FetchDataField"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "ActFetchDataWebhookPayload": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/WebhookEventEnvelope"
+                    },
+                    {
+                        "required": [
+                            "event",
+                            "data"
+                        ],
+                        "properties": {
+                            "event": {
+                                "type": "string",
+                                "const": "act.fetch_data"
+                            },
+                            "data": {
+                                "$ref": "#/components/schemas/ActFetchDataWebhookData"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
             },
             "ActCreatedWebhookData": {
                 "required": [
@@ -1581,8 +1740,116 @@
                     }
                 ]
             },
+            "ActDuplicatedWebhookData": {
+                "required": [
+                    "act",
+                    "source_act_uuid"
+                ],
+                "properties": {
+                    "act": {
+                        "$ref": "#/components/schemas/WebhookActResource"
+                    },
+                    "source_act_uuid": {
+                        "description": "The original act that was duplicated.",
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                },
+                "type": "object"
+            },
+            "ActDuplicatedWebhookPayload": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/WebhookEventEnvelope"
+                    },
+                    {
+                        "required": [
+                            "event",
+                            "data"
+                        ],
+                        "properties": {
+                            "event": {
+                                "type": "string",
+                                "example": "act.duplicated",
+                                "const": "act.duplicated"
+                            },
+                            "data": {
+                                "$ref": "#/components/schemas/ActDuplicatedWebhookData"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "ActCaseTypeResource": {
+                "description": "Case-type identity and labels saved when the act was created. Later catalog changes do not alter these labels.",
+                "required": [
+                    "uuid",
+                    "name",
+                    "translations",
+                    "color"
+                ],
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "b761cba6-56f0-4a74-8979-cd4591c5acbf"
+                    },
+                    "color": {
+                        "description": "Current display color, independent of saved labels. Null uses the neutral style. A queued webhook retains the color at the time its payload was recorded.",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "blue",
+                        "enum": [
+                            "blue",
+                            "green",
+                            "orange",
+                            "purple",
+                            "red",
+                            null
+                        ]
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Annual review"
+                    },
+                    "translations": {
+                        "properties": {
+                            "sv": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "example": "Årlig genomgång"
+                            },
+                            "en": {
+                                "type": [
+                                    "string",
+                                    "null"
+                                ],
+                                "example": "Annual review"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
             "ActCollectionResource": {
                 "properties": {
+                    "case_type": {
+                        "description": "Saved case type, or null for an unclassified act.",
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/ActCaseTypeResource"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
                     "uuid": {
                         "description": "The unique identifier of the act.",
                         "type": "string",
@@ -1629,6 +1896,17 @@
             },
             "ActResource": {
                 "properties": {
+                    "case_type": {
+                        "description": "Saved case type, or null for an unclassified act.",
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/ActCaseTypeResource"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
                     "uuid": {
                         "description": "The unique identifier of the act.",
                         "type": "string",
@@ -2070,7 +2348,7 @@
                         "example": "KYC Template"
                     },
                     "country": {
-                        "description": "The country code the template is associated with.",
+                        "description": "The country code the template is associated with, or * for all countries enabled for the organization. Forms for all countries only contain basic fields.",
                         "type": "string",
                         "example": "SE"
                     },
@@ -2153,7 +2431,7 @@
                         "example": "KYC Template"
                     },
                     "country": {
-                        "description": "The country code the template is associated with.",
+                        "description": "The country code the template is associated with, or * for all countries enabled for the organization. Forms for all countries only contain basic fields.",
                         "type": "string",
                         "example": "SE"
                     },
@@ -2252,6 +2530,17 @@
             },
             "WebhookActResource": {
                 "properties": {
+                    "case_type": {
+                        "description": "Saved case type, or null for an unclassified act.",
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/ActCaseTypeResource"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
                     "uuid": {
                         "description": "The unique identifier of the act.",
                         "type": "string",
@@ -2429,6 +2718,89 @@
         }
     ],
     "webhooks": {
+        "act.fetch_data": {
+            "post": {
+                "tags": [
+                    "Webhook events"
+                ],
+                "summary": "Act data fetch requested",
+                "description": "Sent only when the selected fields include external data fields. Return 2xx to acknowledge delivery, then use the single or bulk act data update endpoint with fetch_request_id and a value or error for each external field. Acknowledging this webhook does not complete the fetch. Identical value retries are idempotent; conflicting, expired, superseded, or concurrently edited fields return 409. Fetch requests expire after the configured processing window (30 minutes by default).",
+                "operationId": "actFetchDataWebhook",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/WebhookSignatureHeader"
+                    },
+                    {
+                        "$ref": "#/components/parameters/WebhookClientIdHeader"
+                    },
+                    {
+                        "$ref": "#/components/parameters/WebhookUserAgentHeader"
+                    },
+                    {
+                        "$ref": "#/components/parameters/WebhookContentTypeHeader"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ActFetchDataWebhookPayload"
+                            },
+                            "example": {
+                                "id": "4be08bac-7e3c-4615-a018-cd47c3d403ad",
+                                "event": "act.fetch_data",
+                                "data": {
+                                    "request_id": "ab102a75-2f1b-4a4b-9e5f-873d9a740d92",
+                                    "requested_at": "2026-10-11T10:00:00Z",
+                                    "expires_at": "2026-10-11T10:30:00Z",
+                                    "act": {
+                                        "uuid": "123e4567-e89b-12d3-a456-426614174000",
+                                        "case_type": null,
+                                        "client_id": 12345,
+                                        "client": {
+                                            "id": 12345,
+                                            "company_name": "Example AB",
+                                            "org_number": "5566778899",
+                                            "country": "SE"
+                                        },
+                                        "template_id": 42,
+                                        "template_name": "Credit assessment",
+                                        "amount": "10000",
+                                        "currency": "SEK",
+                                        "language": "EN",
+                                        "status": "draft",
+                                        "created_at": "2026-10-11T09:00:00Z",
+                                        "updated_at": "2026-10-11T09:00:00Z"
+                                    },
+                                    "fields": [
+                                        {
+                                            "id": 100,
+                                            "template_field_id": 42,
+                                            "template_field_key": "companyName",
+                                            "template_field_name": "Company name",
+                                            "type": "text",
+                                            "external_data_field": true,
+                                            "source": "external_data",
+                                            "tab_id": 1,
+                                            "tab_name": "Company",
+                                            "section_id": 1,
+                                            "section_name": "Identity",
+                                            "options": null
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Request received; results are submitted separately through the API."
+                    }
+                }
+            }
+        },
         "act.created": {
             "post": {
                 "tags": [
@@ -2496,6 +2868,45 @@
                         "application/json": {
                             "schema": {
                                 "$ref": "#/components/schemas/ActStatusChangedWebhookPayload"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Return a non-4xx/non-5xx response to mark delivery successful."
+                    }
+                }
+            }
+        },
+        "act.duplicated": {
+            "post": {
+                "tags": [
+                    "Webhook events"
+                ],
+                "summary": "Act duplicated",
+                "description": "Krebit sends this event after an existing act and its attachments have been copied to a new draft. Duplication does not emit act.created or fetch new data.",
+                "operationId": "actDuplicatedWebhook",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/WebhookSignatureHeader"
+                    },
+                    {
+                        "$ref": "#/components/parameters/WebhookClientIdHeader"
+                    },
+                    {
+                        "$ref": "#/components/parameters/WebhookUserAgentHeader"
+                    },
+                    {
+                        "$ref": "#/components/parameters/WebhookContentTypeHeader"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ActDuplicatedWebhookPayload"
                             }
                         }
                     }
