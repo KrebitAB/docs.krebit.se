@@ -359,6 +359,53 @@
                         "bearerAuth": []
                     }
                 ]
+            },
+            "post": {
+                "tags": [
+                    "Acts"
+                ],
+                "summary": "Create a credit act from a template",
+                "description": "Returns the new draft and its UUID immediately. Initial provider fetching runs in the background. The act.created webhook is sent after initialization. Each successful request creates a new act.",
+                "operationId": "createAct",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ActStoreRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Draft created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "A valid access token is required"
+                    },
+                    "403": {
+                        "description": "Credit act creation is unavailable with the current permissions"
+                    },
+                    "404": {
+                        "description": "Client or template not found"
+                    },
+                    "422": {
+                        "description": "Invalid act details or incompatible template"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/1.0/acts/{uuid}": {
@@ -540,6 +587,156 @@
                     },
                     "401": {
                         "description": "A valid authentication token was not provided with the request"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Acts"
+                ],
+                "summary": "Upload an attachment to an act",
+                "description": "Each successful request creates a new attachment.",
+                "operationId": "createActAttachment",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "description": "One PDF, JPEG, PNG, GIF, WebP, BMP or TIFF up to 19 MiB. Images are stored as a single JPEG.",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Attachment created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActAttachmentResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "A valid access token is required"
+                    },
+                    "403": {
+                        "description": "Attachment uploads are unavailable with the current permissions or act status"
+                    },
+                    "404": {
+                        "description": "Act not found"
+                    },
+                    "422": {
+                        "description": "The file is invalid"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/1.0/acts/{uuid}/attachments/{attachmentId}": {
+            "patch": {
+                "tags": [
+                    "Acts"
+                ],
+                "summary": "Update an act attachment",
+                "description": "Update the attachment name, PDF export selection, or both while the act permits editing.",
+                "operationId": "updateActAttachment",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "attachmentId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "description": "Provide the name, the PDF export setting, or both.",
+                                "minProperties": 1,
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "annual-report.pdf",
+                                        "maxLength": 255,
+                                        "minLength": 1
+                                    },
+                                    "include_in_pdf_export": {
+                                        "description": "Include the attachment in the PDF export. Set to true only when the attachment can be included.",
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Attachment metadata",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActAttachmentResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "A valid access token is required"
+                    },
+                    "403": {
+                        "description": "The attachment cannot be edited with the current permissions or act status"
+                    },
+                    "404": {
+                        "description": "Act or attachment not found"
+                    },
+                    "422": {
+                        "description": "The metadata update is invalid"
                     }
                 },
                 "security": [
@@ -891,6 +1088,53 @@
                     },
                     "401": {
                         "description": "A valid authentication token was not provided with the request"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Clients"
+                ],
+                "summary": "Create a client",
+                "description": "Register a client in the current organization.",
+                "operationId": "createClient",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ClientStoreRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Client created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ClientResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "A valid access token is required"
+                    },
+                    "403": {
+                        "description": "Client creation is unavailable with the current permissions"
+                    },
+                    "409": {
+                        "description": "The company already exists in this organization"
+                    },
+                    "422": {
+                        "description": "Invalid client details or company not found"
                     }
                 },
                 "security": [
@@ -1435,6 +1679,16 @@
                         "description": "Email of the user",
                         "type": "string",
                         "example": "john.doe@example.com"
+                    },
+                    "organizations": {
+                        "description": "Active organizations authorized for this token where the user still has membership.",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "acme"
+                        ]
                     }
                 },
                 "type": "object"
@@ -1926,7 +2180,7 @@
                     "template_name": {
                         "description": "The template name used to create the act.",
                         "type": "string",
-                        "example": "KYC Template"
+                        "example": "Company review"
                     },
                     "amount": {
                         "description": "The requested or approved amount for the act.",
@@ -1947,6 +2201,14 @@
                         "description": "The current status of the act.",
                         "type": "string",
                         "example": "in_progress"
+                    },
+                    "external_upload_url": {
+                        "description": "Link recipients can open to submit files while the act is a draft. Null for other statuses.",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "uri"
                     },
                     "created_at": {
                         "description": "The date when this act was created",
@@ -2212,7 +2474,7 @@
                         "example": "Company Name"
                     },
                     "type": {
-                        "description": "The field type used to validate and render the value.",
+                        "description": "The field type used to validate and render the value. Dropdown values must match one of options.choices; date values must be valid YYYY-MM-DD calendar dates.",
                         "type": "string",
                         "example": "text"
                     },
@@ -2220,6 +2482,16 @@
                         "description": "The stored value for the data point.",
                         "type": "string",
                         "example": "Acme AB"
+                    },
+                    "options": {
+                        "description": "Field settings saved on this act, including effective overrides. Present when the field has settings. Dropdown choices are an ordered array of answer strings.",
+                        "type": "object",
+                        "example": {
+                            "choices": [
+                                "Low",
+                                "High"
+                            ]
+                        }
                     },
                     "required": {
                         "description": "Whether the field is required in the template.",
@@ -2345,10 +2617,10 @@
                     "name": {
                         "description": "The template name.",
                         "type": "string",
-                        "example": "KYC Template"
+                        "example": "Company review"
                     },
                     "country": {
-                        "description": "The country code the template is associated with, or * for all countries enabled for the organization. Forms for all countries only contain basic fields.",
+                        "description": "The template country code, or * for all countries enabled for the organization.",
                         "type": "string",
                         "example": "SE"
                     },
@@ -2406,7 +2678,7 @@
                         "example": true
                     },
                     "options": {
-                        "description": "Field options such as select values or validation settings.",
+                        "description": "Field options. Dropdown fields expose an ordered choices array of strings; submit one of these strings as the answer. Date fields use YYYY-MM-DD values.",
                         "type": "object",
                         "example": "{}"
                     },
@@ -2428,10 +2700,10 @@
                     "name": {
                         "description": "The template name.",
                         "type": "string",
-                        "example": "KYC Template"
+                        "example": "Company review"
                     },
                     "country": {
-                        "description": "The country code the template is associated with, or * for all countries enabled for the organization. Forms for all countries only contain basic fields.",
+                        "description": "The template country code, or * for all countries enabled for the organization.",
                         "type": "string",
                         "example": "SE"
                     },
@@ -2564,7 +2836,7 @@
                     "template_name": {
                         "description": "The template name used to create the act.",
                         "type": "string",
-                        "example": "KYC Template"
+                        "example": "Company review"
                     },
                     "amount": {
                         "description": "The requested or approved amount for the act.",
@@ -2623,6 +2895,73 @@
                     }
                 },
                 "type": "object"
+            },
+            "ClientStoreRequest": {
+                "required": [
+                    "org_number",
+                    "country"
+                ],
+                "properties": {
+                    "org_number": {
+                        "description": "Company registration number or company ID for global clients.",
+                        "type": "string",
+                        "maxLength": 255
+                    },
+                    "country": {
+                        "description": "A country enabled for the organization, or XX for a global client.",
+                        "type": "string",
+                        "enum": [
+                            "SE",
+                            "FI",
+                            "NO",
+                            "XX"
+                        ]
+                    },
+                    "company_name": {
+                        "description": "Required for global clients (XX). For other countries, Krebit looks up the company name.",
+                        "type": "string",
+                        "maxLength": 255
+                    }
+                },
+                "type": "object"
+            },
+            "ActStoreRequest": {
+                "required": [
+                    "client_id",
+                    "template_id",
+                    "currency"
+                ],
+                "properties": {
+                    "client_id": {
+                        "description": "ID of an existing client.",
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "template_id": {
+                        "description": "ID of a Finance template that supports the client’s country.",
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "currency": {
+                        "type": "string",
+                        "example": "SEK"
+                    },
+                    "amount": {
+                        "description": "Amount to assess in whole currency units.",
+                        "type": "integer",
+                        "default": 0,
+                        "minimum": 0
+                    },
+                    "case_type": {
+                        "description": "Case type UUID, required if the organization has active case types.",
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "uuid"
+                    }
+                },
+                "type": "object"
             }
         },
         "parameters": {
@@ -2671,7 +3010,7 @@
         "securitySchemes": {
             "oauth2": {
                 "type": "oauth2",
-                "description": "OAuth2 authorization code flow for API access",
+                "description": "OAuth2 authorization code flow for API access. Users explicitly select organizations on the consent screen. Tokens and refreshed tokens only access those organizations, subject to current membership and permissions. GET /api/1.0/me lists the authorized organizations. Requests to other organizations return 403. New authorizations require consent, including for previously approved applications.",
                 "flows": {
                     "authorizationCode": {
                         "authorizationUrl": "/oauth/authorize",
@@ -2746,50 +3085,6 @@
                         "application/json": {
                             "schema": {
                                 "$ref": "#/components/schemas/ActFetchDataWebhookPayload"
-                            },
-                            "example": {
-                                "id": "4be08bac-7e3c-4615-a018-cd47c3d403ad",
-                                "event": "act.fetch_data",
-                                "data": {
-                                    "request_id": "ab102a75-2f1b-4a4b-9e5f-873d9a740d92",
-                                    "requested_at": "2026-10-11T10:00:00Z",
-                                    "expires_at": "2026-10-11T10:30:00Z",
-                                    "act": {
-                                        "uuid": "123e4567-e89b-12d3-a456-426614174000",
-                                        "case_type": null,
-                                        "client_id": 12345,
-                                        "client": {
-                                            "id": 12345,
-                                            "company_name": "Example AB",
-                                            "org_number": "5566778899",
-                                            "country": "SE"
-                                        },
-                                        "template_id": 42,
-                                        "template_name": "Credit assessment",
-                                        "amount": "10000",
-                                        "currency": "SEK",
-                                        "language": "EN",
-                                        "status": "draft",
-                                        "created_at": "2026-10-11T09:00:00Z",
-                                        "updated_at": "2026-10-11T09:00:00Z"
-                                    },
-                                    "fields": [
-                                        {
-                                            "id": 100,
-                                            "template_field_id": 42,
-                                            "template_field_key": "companyName",
-                                            "template_field_name": "Company name",
-                                            "type": "text",
-                                            "external_data_field": true,
-                                            "source": "external_data",
-                                            "tab_id": 1,
-                                            "tab_name": "Company",
-                                            "section_id": 1,
-                                            "section_name": "Identity",
-                                            "options": null
-                                        }
-                                    ]
-                                }
                             }
                         }
                     }
