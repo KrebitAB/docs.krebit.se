@@ -300,6 +300,38 @@
                         }
                     },
                     {
+                        "name": "template_id",
+                        "in": "query",
+                        "description": "Filter by the template used to create the act.",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by the current status of the act.",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "approved",
+                                "rejected",
+                                "in_progress",
+                                "draft"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "client_id",
+                        "in": "query",
+                        "description": "Filter by the client linked to the act.",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
                         "name": "limit",
                         "in": "query",
                         "description": "The number of acts to return",
@@ -352,6 +384,9 @@
                     },
                     "401": {
                         "description": "A valid authentication token was not provided with the request"
+                    },
+                    "422": {
+                        "description": "Invalid filters"
                     }
                 },
                 "security": [
@@ -399,6 +434,47 @@
                     },
                     "422": {
                         "description": "Invalid act details or incompatible template"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/1.0/case-types": {
+            "get": {
+                "tags": [
+                    "Acts"
+                ],
+                "summary": "List available case types",
+                "description": "Returns the active case types that can be selected when creating an act.",
+                "operationId": "listCaseTypes",
+                "responses": {
+                    "200": {
+                        "description": "Available case types",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/CaseTypeResource"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "A valid access token is required"
+                    },
+                    "403": {
+                        "description": "Case types are unavailable with the current permissions"
                     }
                 },
                 "security": [
@@ -1177,6 +1253,65 @@
                     },
                     "401": {
                         "description": "A valid authentication token was not provided with the request"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Clients"
+                ],
+                "summary": "Update client",
+                "description": "Update the supplied contact details for a client.",
+                "operationId": "updateClient",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Supply at least one contact detail. Omitted fields retain their values. Send null to clear a field.",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ClientContactDetailsRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Client updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ClientResource"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "A valid access token is required"
+                    },
+                    "403": {
+                        "description": "Client updates are unavailable with the current permissions"
+                    },
+                    "404": {
+                        "description": "Client not found"
+                    },
+                    "422": {
+                        "description": "Invalid contact details"
                     }
                 },
                 "security": [
@@ -2120,6 +2255,16 @@
                         "type": "integer",
                         "example": "12345"
                     },
+                    "status": {
+                        "description": "The current status of the act.",
+                        "type": "string",
+                        "enum": [
+                            "approved",
+                            "rejected",
+                            "in_progress",
+                            "draft"
+                        ]
+                    },
                     "amount": {
                         "description": "The requested or approved amount for the act.",
                         "type": "integer",
@@ -2304,6 +2449,24 @@
                         "description": "The date when the attachment was last updated.",
                         "type": "string",
                         "example": "2021-09-01T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "CaseTypeResource": {
+                "required": [
+                    "uuid",
+                    "name"
+                ],
+                "properties": {
+                    "uuid": {
+                        "description": "UUID to pass as case_type when creating an act.",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Company review"
                     }
                 },
                 "type": "object"
@@ -2896,34 +3059,72 @@
                 },
                 "type": "object"
             },
+            "ClientContactDetailsRequest": {
+                "properties": {
+                    "contact_person_name": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "Alex Andersson",
+                        "maxLength": 255
+                    },
+                    "contact_person_email": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "format": "email",
+                        "example": "alex@example.com",
+                        "maxLength": 255
+                    },
+                    "contact_person_phone": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "example": "+46123456789",
+                        "maxLength": 255
+                    }
+                },
+                "type": "object"
+            },
             "ClientStoreRequest": {
                 "required": [
                     "org_number",
                     "country"
                 ],
-                "properties": {
-                    "org_number": {
-                        "description": "Company registration number or company ID for global clients.",
-                        "type": "string",
-                        "maxLength": 255
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ClientContactDetailsRequest"
                     },
-                    "country": {
-                        "description": "A country enabled for the organization, or XX for a global client.",
-                        "type": "string",
-                        "enum": [
-                            "SE",
-                            "FI",
-                            "NO",
-                            "XX"
-                        ]
-                    },
-                    "company_name": {
-                        "description": "Required for global clients (XX). For other countries, Krebit looks up the company name.",
-                        "type": "string",
-                        "maxLength": 255
+                    {
+                        "properties": {
+                            "org_number": {
+                                "description": "Company registration number or company ID for global clients.",
+                                "type": "string",
+                                "maxLength": 255
+                            },
+                            "country": {
+                                "description": "A country enabled for the organization, or XX for a global client.",
+                                "type": "string",
+                                "enum": [
+                                    "SE",
+                                    "FI",
+                                    "NO",
+                                    "XX"
+                                ]
+                            },
+                            "company_name": {
+                                "description": "Required for global clients (XX). For other countries, Krebit looks up the company name.",
+                                "type": "string",
+                                "maxLength": 255
+                            }
+                        },
+                        "type": "object"
                     }
-                },
-                "type": "object"
+                ]
             },
             "ActStoreRequest": {
                 "required": [
